@@ -13,7 +13,7 @@ services:
       - "./app.js:/opt/service/app.js"
       - "./src:/opt/service/src"
     environment:
-      - DB_ACCESS_URL="http://db:8529"
+      - DB_ACCESS_URL=http://db:8529
       - DB_NAME=reportdb
       - DB_USERNAME=reportuser
       - DB_PASSWORD=reportuserpassword

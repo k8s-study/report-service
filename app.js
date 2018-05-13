@@ -1,18 +1,24 @@
+'use strict';
+
 const http = require('http');
-const arangojs = require('arangojs');
+const Koa = require('koa');
+const logger = require('koa-logger');
+const bodyParser = require('koa-bodyparser');
 
-const db = new arangojs.Database({
-    url: process.env.DB_ACCESS_URL || 'http://127.0.0.1:8529',
-    databaseName: process.env.DB_NAME || 'testdb',
-}).useBasicAuth(
-    process.env.DB_USER || 'testuser',
-    process.env.DB_PASS || 'testpassword',
-);
+const db = require('./src/db')
+const routes = require('./src/routes');
 
-http.createServer(function (request, response) {
-    response.writeHead(200, {'Content-Type': 'application/json'});
-    response.end(JSON.stringify({
-        message: 'Hello from Report service',
-        dbConnectionInfo: db._connection.config
-    }));
-}).listen(8000);
+
+const app = new Koa();
+
+app.use(logger());
+app.use(bodyParser());
+
+app.use(db.setContext())
+app.use(routes.routes());
+
+const server = http.createServer(app.callback());
+server.listen(8000);
+server.on('listening', () => {
+    console.log('server is listening on the port 8000');
+});
