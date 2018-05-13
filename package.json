@@ -1,0 +1,14 @@
+{
+  "name": "report-service",
+  "version": "0.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/k8s-study/report-service.git"
+  },
+  "author": "",
+  "license": "MIT"
+}
