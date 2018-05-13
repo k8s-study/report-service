@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "main": "app.js",
   "scripts": {
+    "start": "npx nodemon ./app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -10,5 +11,9 @@
     "url": "git+https://github.com/k8s-study/report-service.git"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "arangojs": "^5.8.0",
+    "nodemon": "^1.17.4"
+  }
 }

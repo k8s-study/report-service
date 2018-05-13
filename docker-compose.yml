@@ -1,0 +1,41 @@
+version: '3.6'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    networks:
+      - report-service
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./package.json:/opt/service/package.json"
+      - "./app.js:/opt/service/app.js"
+      - "./src:/opt/service/src"
+    environment:
+      - DB_ACCESS_URL="http://db:8529"
+      - DB_NAME=reportdb
+      - DB_USERNAME=reportuser
+      - DB_PASSWORD=reportuserpassword
+    depends_on:
+      - db
+  db:
+    image: arangodb:3.3
+    volumes:
+      - "dbdata:/var/lib/arangodb3"
+      - "./init/db-init.sh:/docker-entrypoint-initdb.d/db-init.sh"
+    environment:
+      - ARANGO_ROOT_PASSWORD=mypassword
+      - DB_NAME=reportdb
+      - DB_USERNAME=reportuser
+      - DB_PASSWORD=reportuserpassword
+    networks:
+      - report-service
+    ports:
+      - "8529:8529"
+
+networks:
+  report-service:
+
+volumes:
+  dbdata:
