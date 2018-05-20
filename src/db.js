@@ -1,5 +1,3 @@
-'use strict';
-
 const arangojs = require('arangojs');
 
 // database connection pool
@@ -12,17 +10,16 @@ const db = new arangojs.Database({
 );
 
 // create the collection if not exist
-const collection = db.collection('reports')
-collection.get().then(null, ()=>{
-    collection.create().then((success) => {
-        console.log('collection was created')
-    }, (failed) => {
-        console.log('collection access failed')
+const collection = db.collection('reports');
+collection.get().then(null, () => {
+    collection.create().then(() => {
+        console.log('collection was created'); // eslint-disable-line
+    }, () => {
+        console.log('collection access failed'); // eslint-disable-line
     });
 });
 
-exports.setContext = (opts) => async (ctx, next) => {
-    console.log('process.env.DB_ACCESS_URL', process.env.DB_ACCESS_URL)
+exports.setContext = () => async (ctx, next) => {
     ctx.db = db;
     ctx.reports = collection;
     await next();

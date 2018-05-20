@@ -1,6 +1,4 @@
-'use strict';
-
-exports.healthcheck = async (ctx, next) => {
-    let aa = await ctx.reports.get();
-    ctx.body = {message: 'ok'}
-}
+exports.healthcheck = async (ctx) => {
+    const dbCheck = await ctx.reports.get(); // eslint-disable-line
+    ctx.body = { message: 'ok' };
+};
