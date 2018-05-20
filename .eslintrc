@@ -1,0 +1,13 @@
+{
+    "extends": "airbnb",
+    "env": {
+        "node": true
+    },
+    "plugins": [
+        "jest"
+    ],
+    "rules": {
+        "arrow-body-style": "off",
+        "indent": ["error", 4]
+    }
+}

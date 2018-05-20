@@ -9,6 +9,11 @@
 $ docker-compose up
 ```
 
+## Lint code
+```
+$ npm run lint
+```
+
 ## Deployment using Kubernetes
 ```
 ```
