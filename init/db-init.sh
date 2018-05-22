@@ -1,5 +1,5 @@
 arangosh \
-    --server.endpoint=unix:///tmp/arangodb-tmp.sock \
+    --server.endpoint=$ARANGO_SERVER_ENDPOINT \
     --server.password=$ARANGO_ROOT_PASSWORD \
     --javascript.execute-string \
 '

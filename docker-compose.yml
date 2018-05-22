@@ -26,6 +26,7 @@ services:
       - "dbdata:/var/lib/arangodb3"
       - "./init/db-init.sh:/docker-entrypoint-initdb.d/db-init.sh"
     environment:
+      - ARANGO_SERVER_ENDPOINT=unix:///tmp/arangodb-tmp.sock
       - ARANGO_ROOT_PASSWORD=mypassword
       - DB_NAME=reportdb
       - DB_USERNAME=reportuser
