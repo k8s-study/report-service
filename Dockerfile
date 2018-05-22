@@ -6,10 +6,11 @@ RUN \
 
 WORKDIR /opt/service
 
-ADD ./package.json ./
-ADD ./app.js ./
-ADD ./src ./
+ADD package.json ./
+ADD app.js ./
+ADD src ./src
+ADD init ./init
 
 RUN npm install
 
-CMD npm start
+CMD node ./app.js
