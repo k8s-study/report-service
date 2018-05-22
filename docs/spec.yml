@@ -32,3 +32,52 @@ paths:
                     type: string
                 example:
                   message: ok
+  /results:
+    post:
+      description: the path for collecting PING results
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: ping-result
+          description: the ping result to store
+          schema:
+            type: object
+            required:
+              - url
+              - utctime
+              - status
+            properties:
+              url:
+                description: pinged url (must be a valid url.)
+                type: string
+                example: https://kubernetes.io
+              utctime:
+                description: pinged time in UTC (YYYY-MM-DDThh:mm:ss.ssZ)
+                type: string
+                example: '1985-04-12T23:20:50.52Z'
+              status:
+                description: pinged status
+                type: string
+                enum: ['200', '300', '400', '500']
+                example: '200'
+              latency:
+                description: the time taken for each ping investigation in millisecond (optional)
+                type: number
+                example: 1578
+      responses:
+        '201':
+          description: created
+        '400':
+          description: bad request, input paramter error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fieldname:
+                    description: field-level validation error message
+                    type: string
+                example:
+                  url: invalid url
+                  utctime: invalid utc time format. must be of YYYY-MM-DDThh:mm:ss.ssZ
