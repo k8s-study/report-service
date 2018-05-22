@@ -1,0 +1,144 @@
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: report-service-db
+spec:
+  ports:
+  - port: 8529
+  selector:
+    type: db
+    service: report-service
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-service-db
+  labels:
+    type: db
+    service: report-service
+spec:
+  selector:
+    matchLabels:
+      type: db
+      service: report-service
+  template:
+    metadata:
+      labels:
+        type: db
+        service: report-service
+    spec:
+      containers:
+      - name: db
+        image: arangodb:3.3
+        env:
+        - name: ARANGO_ROOT_PASSWORD
+          value: mypassword
+        ports:
+        - containerPort: 8529
+          protocol: TCP
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: report-service-api
+spec:
+  type: NodePort
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    type: api
+    service: report-service
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: report-service-api
+  labels:
+    type: api
+    service: report-service
+    language: javascript
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      type: api
+      service: report-service
+  minReadySeconds: 5
+  progressDeadlineSeconds: 60
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        type: api
+        service: report-service
+        language: javascript
+    spec:
+      containers:
+      - name: report-service-api
+        image: ssureymoon/k8s-study-report-service:0.0.1
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        env:
+        - name: DB_ACCESS_URL
+          value: http+tcp://report-service-db:8529
+        - name: DB_NAME
+          value: reportdb
+        - name: DB_USERNAME
+          value: reportuser
+        - name: DB_PASSWORD
+          value: reportuserpassword
+        readinessProbe:
+          httpGet:
+            path: /v1/health
+            port: 8000
+          initialDelaySeconds: 20
+          periodSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: /v1/health
+            port: 8000
+          initialDelaySeconds: 3
+          periodSeconds: 3
+
+---
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: report-service-db-init
+spec:
+  backoffLimit: 5
+  template:
+    metadata:
+      name: report-service-db-init
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: report-service-db-init
+          image: ssureymoon/k8s-study-report-service:0.0.1
+          command: ["sh", "/opt/service/init/db-init.sh"]
+          env:
+            - name: ARANGO_SERVER_ENDPOINT
+              value: http+tcp://report-service-db:8529
+            - name: ARANGO_ROOT_PASSWORD
+              value: mypassword
+            - name: DB_NAME
+              value: reportdb
+            - name: DB_USERNAME
+              value: reportuser
+            - name: DB_PASSWORD
+              value: reportuserpassword
