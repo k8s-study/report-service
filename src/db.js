@@ -2,7 +2,7 @@ const arangojs = require('arangojs');
 
 // database connection pool
 const db = new arangojs.Database({
-    url: process.env.DB_ACCESS_URL || 'http://127.0.0.1:8529',
+    url: process.env.DB_ACCESS_URL || 'http+tcp://127.0.0.1:8529',
     databaseName: process.env.DB_NAME || 'testdb',
 }).useBasicAuth(
     process.env.DB_USERNAME || 'testuser',
