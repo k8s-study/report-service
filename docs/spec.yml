@@ -53,7 +53,7 @@ paths:
                 type: string
                 example: https://kubernetes.io
               utctime:
-                description: pinged time in UTC (YYYY-MM-DDThh:mm:ss.ssZ)
+                description: pinged time in UTC (YYYY-MM-DDTHH:mm:ss.SSZ)
                 type: string
                 example: '1985-04-12T23:20:50.52Z'
               status:
@@ -80,7 +80,7 @@ paths:
                     type: string
                 example:
                   url: invalid url
-                  utctime: invalid utc time format. must be of YYYY-MM-DDThh:mm:ss.ssZ
+                  utctime: invalid utc time format. must be of YYYY-MM-DDTHH:mm:ss.SSZ
   /reports:
     get:
       description: the path to fetch ping reports for the certain period of time
@@ -95,14 +95,14 @@ paths:
         - in: query
           name: starttime
           required: true
-          description: the start time in UTC of the report to fetch (YYYY-MM-DDThh:mm:ss.ssZ)
+          description: the start time in UTC of the report to fetch (YYYY-MM-DDTHH:mm:ss.SSZ)
           example: '2018-05-01T23:20:50.52Z'
           schema:
             type: string
         - in: query
           name: endtime
           required: true
-          description: the end time in UTC of the report to fetch (YYYY-MM-DDThh:mm:ss.ssZ)
+          description: the end time in UTC of the report to fetch (YYYY-MM-DDTHH:mm:ss.SSZ)
           example: '2018-05-31T23:20:50.52Z'
           schema:
             type: string
@@ -123,4 +123,4 @@ paths:
                     type: string
                 example:
                   url: invalid url
-                  starttime: invalid utc time format. must be of YYYY-MM-DDThh:mm:ss.ssZ
+                  starttime: invalid utc time format. must be of YYYY-MM-DDTHH:mm:ss.SSZ
