@@ -11,7 +11,7 @@ $ docker-compose up
 
 ## Lint code
 ```
-$ npm run lint
+$ docker-compose exec app npm run lint
 ```
 
 ## Deployment using Kubernetes

@@ -13,6 +13,7 @@ services:
       - "./package.json:/opt/service/package.json"
       - "./app.js:/opt/service/app.js"
       - "./src:/opt/service/src"
+      - ".eslintrc:/opt/service/.eslintrc"
     environment:
       - DB_ACCESS_URL=http+tcp://db:8529
       - DB_NAME=reportdb
