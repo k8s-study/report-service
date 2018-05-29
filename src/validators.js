@@ -2,13 +2,13 @@ const validator = require('validator');
 const moment = require('moment');
 
 const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss.SSZ';
-const resultValidators = {
+const commonValidators = {
     url: {
         required: true,
         validate: value => validator.isURL(value, { require_protocol: true }),
         message: 'invalid URL format',
     },
-    utctime: {
+    datetime: {
         required: true,
         validate: value => moment(value, DATE_FORMAT, true).isValid(),
         message: 'invalid utc time format. must be of YYYY-MM-DDTHH:mm:ss.SSZ',
@@ -23,14 +23,24 @@ const resultValidators = {
         validate: value => validator.isInt(`${value}`, { min: 0, allow_leading_zeroes: false }),
         message: 'invalid latency (ms), must be of integer lte 0',
     },
+    summary: {
+        required: false,
+        validate: value => ['', 'true', 'false'].includes(value),
+        message: 'summary must be of one of true, false, or not provided',
+    },
 };
 
-module.exports.results = async (ctx, next) => {
-    // validate body
-    const body = { ...ctx.request.body };
-    const validationMessages = Object.keys(resultValidators).reduce((prevObj, key) => {
-        const fieldValidator = resultValidators[key];
-        const value = body[key];
+const resultValidators = {
+    url: commonValidators.url,
+    utctime: commonValidators.datetime,
+    status: commonValidators.status,
+    latency: commonValidators.latency,
+};
+
+const validate = (validatorsObj, objToValidate) => {
+    const messages = Object.keys(validatorsObj).reduce((prevObj, key) => {
+        const fieldValidator = validatorsObj[key];
+        const value = objToValidate[key];
         if ((typeof value === 'undefined' || value === null)) {
             if (fieldValidator.required) {
                 return {
@@ -50,25 +60,56 @@ module.exports.results = async (ctx, next) => {
         return { ...prevObj };
     }, {});
 
-    ctx.validation = {
-        isValid: Object.keys(validationMessages).length === 0,
-        messages: validationMessages,
+    return {
+        isValid: Object.keys(messages).length === 0,
+        messages,
     };
+};
+
+const sanitize = (sanitizersObj, objToSanitize) => {
+    return Object.keys(objToSanitize).reduce((prevObj, key) => {
+        if (key in sanitizersObj) {
+            return {
+                ...prevObj,
+                [key]: objToSanitize[key],
+            };
+        }
+        return { ...prevObj };
+    }, {});
+};
+
+module.exports.results = async (ctx, next) => {
+    // validate body
+    const body = { ...ctx.request.body };
+    ctx.validation = validate(resultValidators, body);
 
     // sanitize body
     if (ctx.validation.isValid) {
-        ctx.sanitizedBody = Object.keys(ctx.request.body).reduce((prevObj, key) => {
-            if (key in resultValidators) {
-                return {
-                    ...prevObj,
-                    [key]: ctx.request.body[key],
-                };
-            }
-            return { ...prevObj };
-        }, {});
+        ctx.sanitizedBody = sanitize(resultValidators, body);
     } else {
         ctx.sanitizedBody = {};
     }
 
+    await next();
+};
+
+const reportValidators = {
+    url: commonValidators.url,
+    starttime: commonValidators.datetime,
+    endtime: commonValidators.datetime,
+    summary: commonValidators.summary,
+};
+
+module.exports.reports = async (ctx, next) => {
+    // validate body
+    const query = { ...ctx.query };
+    ctx.validation = validate(reportValidators, query);
+
+    // sanitize body
+    if (ctx.validation.isValid) {
+        ctx.sanitizedBody = sanitize(reportValidators, query);
+    } else {
+        ctx.sanitizedBody = {};
+    }
     await next();
 };

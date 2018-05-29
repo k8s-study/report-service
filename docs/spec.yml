@@ -106,11 +106,39 @@ paths:
           example: '2018-05-31T23:20:50.52Z'
           schema:
             type: string
+        - in: query
+          name: summary
+          required: false
+          description: the flag to fetch the summarized data only, default = false
+          example: 'true'
+          schema:
+            type: string
+            enum: ['', 'true', 'false']
       responses:
         '200':
-          description: not specified yet
-        '404':
-          description: no report for the url
+          description: return a summary object and an array of pinged results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    description: the summarized object of the pinged results
+                    type: object
+                    example:
+                      '200': 277
+                      '400': 22
+                      '500': 1
+                  results:
+                    description: the array of the pinged results
+                    type: array
+                    items:
+                      type: object
+                      example:
+                        url: https://kubernetes.io
+                        utctime: '2018-05-12T23:20:50.52Z'
+                        status: '200'
+                        latency: 17000
         '400':
           description: bad request, input paramter error
           content:

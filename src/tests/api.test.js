@@ -12,6 +12,16 @@ describe('healthcheck endpoint', async () => {
 });
 
 describe('result endpoint', async () => {
+    beforeAll(async () => {
+        try {
+            await db.collection.create();
+        } catch (error) {
+            if (!error.errorNum === 1207) {
+                throw error;
+            }
+        }
+    });
+
     test('should return 400 for an invalid request', async () => {
         const response = await request(app.callback()).post(`/${API_VER}/results`, {});
         expect(response.status).toEqual(400);
@@ -42,6 +52,86 @@ describe('result endpoint', async () => {
         const doc = await docs.next();
         expect(doc).toEqual(expect.objectContaining(testObject));
         expect(response.status).toEqual(201);
+    });
+
+    afterEach(async () => {
+        // delete all docs in the collection after each test
+        await db.collection.truncate();
+    });
+
+    afterAll(async () => {
+        // drop the collection after all tests
+        await db.collection.drop();
+    });
+});
+
+describe('report endpoint', async () => {
+    beforeAll(async () => {
+        try {
+            await db.collection.create();
+        } catch (error) {
+            if (!error.errorNum === 1207) {
+                throw error;
+            }
+        }
+    });
+
+    beforeEach(async () => {
+        await db.collection.import([
+            { url: 'https://kubernetes.io', utctime: '2018-04-28T07:20:50.52Z', status: '200' },
+            { url: 'https://kubernetes.io', utctime: '2018-05-04T07:20:50.52Z', status: '200' },
+            { url: 'https://kubernetes.io', utctime: '2018-05-05T07:20:50.52Z', status: '200' },
+            { url: 'https://kubernetes.io', utctime: '2018-05-27T07:20:50.52Z', status: '400' },
+            { url: 'https://kubernetes.io', utctime: '2018-05-28T07:20:50.52Z', status: '500' },
+            { url: 'https://kubernetes.io/docs', utctime: '2018-05-29T07:20:50.52Z', status: '500' },
+        ]);
+    });
+
+    test('should return 400 for an invalid request', async () => {
+        const response = await request(app.callback())
+            .get(`/${API_VER}/reports`)
+            .query({});
+        expect(response.status).toEqual(400);
+        expect(response.body).toEqual({
+            url: 'required but not provided',
+            starttime: 'required but not provided',
+            endtime: 'required but not provided',
+        });
+    });
+
+    test('should return summary and results based on the given query', async () => {
+        const testQuery = {
+            url: 'https://kubernetes.io',
+            starttime: '2018-05-01T01:20:50.52Z',
+            endtime: '2018-05-31T01:20:50.52Z',
+        };
+
+        const response = await request(app.callback())
+            .get(`/${API_VER}/reports`)
+            .query(testQuery);
+        expect(response.status).toEqual(200);
+        expect(response.body.summary).toEqual({
+            200: 2, 400: 1, 500: 1,
+        });
+        expect(response.body.results).toHaveLength(4);
+    });
+
+    test('should return summary only when summary=true is provided', async () => {
+        const testQuery = {
+            url: 'https://kubernetes.io',
+            starttime: '2018-04-01T01:20:50.52Z', // include April
+            endtime: '2018-05-31T01:20:50.52Z',
+            summary: 'true',
+        };
+
+        const response = await request(app.callback())
+            .get(`/${API_VER}/reports`)
+            .query(testQuery);
+        expect(response.status).toEqual(200);
+        expect(response.body.summary).toEqual({
+            200: 3, 400: 1, 500: 1,
+        });
+        expect(response.body.results).not.toBeDefined();
     });
 
     afterEach(async () => {
