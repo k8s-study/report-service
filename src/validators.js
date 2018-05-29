@@ -23,6 +23,11 @@ const commonValidators = {
         validate: value => validator.isInt(`${value}`, { min: 0, allow_leading_zeroes: false }),
         message: 'invalid latency (ms), must be of integer lte 0',
     },
+    summary: {
+        required: false,
+        validate: value => ['', 'true', 'false'].includes(value),
+        message: 'summary must be of one of true, false, or not provided',
+    },
 };
 
 const resultValidators = {
@@ -85,5 +90,26 @@ module.exports.results = async (ctx, next) => {
         ctx.sanitizedBody = {};
     }
 
+    await next();
+};
+
+const reportValidators = {
+    url: commonValidators.url,
+    starttime: commonValidators.datetime,
+    endtime: commonValidators.datetime,
+    summary: commonValidators.summary,
+};
+
+module.exports.reports = async (ctx, next) => {
+    // validate body
+    const query = { ...ctx.query };
+    ctx.validation = validate(reportValidators, query);
+
+    // sanitize body
+    if (ctx.validation.isValid) {
+        ctx.sanitizedBody = sanitize(reportValidators, query);
+    } else {
+        ctx.sanitizedBody = {};
+    }
     await next();
 };
