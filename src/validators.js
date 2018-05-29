@@ -5,7 +5,7 @@ const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss.SSZ';
 const resultValidators = {
     url: {
         required: true,
-        validate: validator.isURL,
+        validate: value => validator.isURL(value, { require_protocol: true }),
         message: 'invalid URL format',
     },
     utctime: {
