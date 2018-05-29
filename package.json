@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "main": "app.js",
   "scripts": {
-    "lint": "npx eslint ./app.js ./src",
-    "start": "npx nodemon ./app.js",
+    "lint": "npx eslint ./app.js ./server.js ./src",
+    "start": "npx nodemon ./server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -20,4 +20,4 @@ ADD init ./init
 
 RUN npm install
 
-CMD node ./app.js
+CMD node ./server.js
