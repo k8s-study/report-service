@@ -14,6 +14,11 @@ $ docker-compose up
 $ docker-compose exec app npm run lint
 ```
 
+## Unit test
+```
+$ docker-compose exec app npm test
+```
+
 ## Deployment using Kubernetes
 ```
 ```

@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "npx eslint ./app.js ./server.js ./src",
     "start": "npx nodemon ./server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -15,6 +15,7 @@
   "license": "MIT",
   "dependencies": {
     "arangojs": "^5.8.0",
+    "jest": "^23.0.1",
     "koa": "^2.5.1",
     "koa-bodyparser": "^4.2.0",
     "koa-logger": "^3.2.0",
