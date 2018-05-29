@@ -12,6 +12,16 @@ describe('healthcheck endpoint', async () => {
 });
 
 describe('result endpoint', async () => {
+    beforeAll(async () => {
+        try {
+            await db.collection.create();
+        } catch (error) {
+            if (!error.errorNum === 1207) {
+                throw error;
+            }
+        }
+    });
+
     test('should return 400 for an invalid request', async () => {
         const response = await request(app.callback()).post(`/${API_VER}/results`, {});
         expect(response.status).toEqual(400);
