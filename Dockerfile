@@ -15,6 +15,7 @@ WORKDIR /opt/service
 
 ADD package.json ./
 ADD app.js ./
+ADD server.js ./
 ADD src ./src
 ADD init ./init
 
