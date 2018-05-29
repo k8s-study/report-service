@@ -31,12 +31,16 @@ module.exports.results = async (ctx, next) => {
     const validationMessages = Object.keys(resultValidators).reduce((prevObj, key) => {
         const fieldValidator = resultValidators[key];
         const value = body[key];
-        if ((typeof value === 'undefined' || value === null) && fieldValidator.required) {
-            return {
-                ...prevObj,
-                [key]: 'required but not provided',
-            };
+        if ((typeof value === 'undefined' || value === null)) {
+            if (fieldValidator.required) {
+                return {
+                    ...prevObj,
+                    [key]: 'required but not provided',
+                };
+            }
+            return { ...prevObj };
         }
+
         if (!fieldValidator.validate(value)) {
             return {
                 ...prevObj,
@@ -52,14 +56,19 @@ module.exports.results = async (ctx, next) => {
     };
 
     // sanitize body
-    ctx.sanitizedBody = Object.keys(ctx.request.body).reduce((prevObj, key) => {
-        if (key in resultValidators) {
-            return {
-                ...prevObj,
-                [key]: ctx.request.body[key],
-            };
-        }
-        return { ...prevObj };
-    }, {});
+    if (ctx.validation.isValid) {
+        ctx.sanitizedBody = Object.keys(ctx.request.body).reduce((prevObj, key) => {
+            if (key in resultValidators) {
+                return {
+                    ...prevObj,
+                    [key]: ctx.request.body[key],
+                };
+            }
+            return { ...prevObj };
+        }, {});
+    } else {
+        ctx.sanitizedBody = {};
+    }
+
     await next();
 };
