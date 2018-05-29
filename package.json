@@ -5,7 +5,7 @@
   "scripts": {
     "lint": "npx eslint ./app.js ./server.js ./src",
     "start": "npx nodemon ./server.js",
-    "test": "jest"
+    "test": "NODE_ENV=test jest"
   },
   "repository": {
     "type": "git",

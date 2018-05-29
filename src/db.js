@@ -1,16 +1,17 @@
 const arangojs = require('arangojs');
+const dbConfig = require('./config').database;
 
 // database connection pool
 const db = new arangojs.Database({
-    url: process.env.DB_ACCESS_URL || 'http+tcp://127.0.0.1:8529',
-    databaseName: process.env.DB_NAME || 'testdb',
+    url: dbConfig.accessUrl,
+    databaseName: dbConfig.dbName,
 }).useBasicAuth(
-    process.env.DB_USERNAME || 'testuser',
-    process.env.DB_PASSWORD || 'testpassword',
+    dbConfig.dbUsername,
+    dbConfig.dbPassword,
 );
 
 // create the collection if not exist
-const collection = db.collection('reports');
+const collection = db.collection(dbConfig.dbCollection);
 collection.get().then(null, () => {
     collection.create().then(() => {
         console.log('collection was created'); // eslint-disable-line
@@ -19,8 +20,14 @@ collection.get().then(null, () => {
     });
 });
 
-exports.setContext = () => async (ctx, next) => {
+const setContext = () => async (ctx, next) => {
     ctx.db = db;
     ctx.reports = collection;
     await next();
+};
+
+module.exports = {
+    db,
+    collection,
+    setContext,
 };
