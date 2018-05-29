@@ -8,6 +8,8 @@
 ```
 $ docker-compose up
 ```
+- api server: http://127.0.0.1:8000
+- db server: http://127.0.0.1:8529
 
 ## Lint code
 ```
@@ -21,4 +23,5 @@ $ docker-compose exec app npm test
 
 ## Deployment using Kubernetes
 ```
+$ kubectl create -f k8s/report-service.yml
 ```
