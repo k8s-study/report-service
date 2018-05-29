@@ -9,5 +9,6 @@ const router = new Router({
 });
 router.get('/health', controllers.healthcheck);
 router.post('/results', validators.results, controllers.results);
+router.get('/reports', validators.reports, controllers.reports);
 
 module.exports = router;
