@@ -23,7 +23,7 @@ describe('Validator for pinged results', async () => {
         expect(ctx.sanitizedBody).toEqual({});
     });
 
-    test('should return valid status when required fields do not exist', async () => {
+    test('should return valid status when required fields are in the right formats', async () => {
         ctx = {
             request: {
                 body: {
