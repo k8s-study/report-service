@@ -6,20 +6,22 @@ describe('healthcheck controller', async () => {
 
     beforeEach(() => {
         ctx = {
-            client: {
-                healthcheck: jest.fn(),
+            database: {
+                client: {
+                    healthcheck: jest.fn(),
+                },
             },
         };
     });
 
     test('should check database connection status', async () => {
         await controllers.healthcheck(ctx, next);
-        expect(ctx.client.healthcheck).toHaveBeenCalled();
+        expect(ctx.database.client.healthcheck).toHaveBeenCalled();
         expect(ctx.body).toEqual({ message: 'ok' });
     });
 
     test('should throw an exeption when the database connection fails', async () => {
-        ctx.client.healthcheck.mockImplementation(() => {
+        ctx.database.client.healthcheck.mockImplementation(() => {
             throw new Error('DB connection failed');
         });
         expect(controllers.healthcheck(ctx, next)).rejects.toThrowError();
@@ -33,8 +35,10 @@ describe('pingend results controller', async () => {
 
     beforeEach(() => {
         ctx = {
-            client: {
-                saveResult: jest.fn(),
+            database: {
+                client: {
+                    saveResult: jest.fn(),
+                },
             },
         };
     });
@@ -47,7 +51,7 @@ describe('pingend results controller', async () => {
             },
         };
         await controllers.results(ctx, next);
-        expect(ctx.client.saveResult).not.toHaveBeenCalled();
+        expect(ctx.database.client.saveResult).not.toHaveBeenCalled();
         expect(ctx.status).toEqual(400);
         expect(ctx.body).toEqual(ctx.validation.messages);
     });
@@ -61,7 +65,7 @@ describe('pingend results controller', async () => {
             status: 'good',
         };
         await controllers.results(ctx, next);
-        expect(ctx.client.saveResult).toHaveBeenCalledWith(ctx.sanitizedBody);
+        expect(ctx.database.client.saveResult).toHaveBeenCalledWith(ctx.sanitizedBody);
         expect(ctx.status).toEqual(201);
     });
 });
@@ -72,11 +76,13 @@ describe('report query controller', async () => {
 
     beforeEach(() => {
         ctx = {
-            client: {
-                generateReport: jest.fn(),
+            database: {
+                client: {
+                    generateReport: jest.fn(),
+                },
             },
         };
-        ctx.client.generateReport.mockImplementation(() => ({
+        ctx.database.client.generateReport.mockImplementation(() => ({
             summary: {},
             results: [],
         }));
@@ -90,7 +96,7 @@ describe('report query controller', async () => {
             },
         };
         await controllers.reports(ctx, next);
-        expect(ctx.client.generateReport).not.toHaveBeenCalled();
+        expect(ctx.database.client.generateReport).not.toHaveBeenCalled();
         expect(ctx.status).toEqual(400);
         expect(ctx.body).toEqual(ctx.validation.messages);
     });
@@ -105,7 +111,7 @@ describe('report query controller', async () => {
             endtime: 'endtime',
         };
         await controllers.reports(ctx, next);
-        expect(ctx.client.generateReport).toHaveBeenCalledWith(ctx.sanitizedBody, false);
+        expect(ctx.database.client.generateReport).toHaveBeenCalledWith(ctx.sanitizedBody, false);
         expect(ctx.status).toEqual(200);
         expect(ctx.body).toEqual({
             summary: {},
@@ -124,7 +130,7 @@ describe('report query controller', async () => {
             summary: 'true',
         };
         await controllers.reports(ctx, next);
-        expect(ctx.client.generateReport).toHaveBeenCalledWith(ctx.sanitizedBody, true);
+        expect(ctx.database.client.generateReport).toHaveBeenCalledWith(ctx.sanitizedBody, true);
         expect(ctx.status).toEqual(200);
         expect(ctx.body).toEqual({
             summary: {},

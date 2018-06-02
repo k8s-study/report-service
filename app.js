@@ -16,9 +16,9 @@ if (environment === 'develop') {
 
 app.use(bodyParser());
 app.use(middlewares.setContext({
-    db: db.db,
-    reports: db.collection,
-    client: db.client,
+    database: {
+        client: db.client,
+    },
 }));
 app.use(routes.routes());
 
