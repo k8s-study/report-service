@@ -78,21 +78,6 @@ const sanitize = (sanitizersObj, objToSanitize) => {
     }, {});
 };
 
-module.exports.results = async (ctx, next) => {
-    // validate body
-    const body = { ...ctx.request.body };
-    ctx.validation = validate(resultValidators, body);
-
-    // sanitize body
-    if (ctx.validation.isValid) {
-        ctx.sanitizedBody = sanitize(resultValidators, body);
-    } else {
-        ctx.sanitizedBody = {};
-    }
-
-    await next();
-};
-
 const reportValidators = {
     url: commonValidators.url,
     starttime: commonValidators.datetime,
@@ -100,16 +85,9 @@ const reportValidators = {
     summary: commonValidators.summary,
 };
 
-module.exports.reports = async (ctx, next) => {
-    // validate body
-    const query = { ...ctx.query };
-    ctx.validation = validate(reportValidators, query);
-
-    // sanitize body
-    if (ctx.validation.isValid) {
-        ctx.sanitizedBody = sanitize(reportValidators, query);
-    } else {
-        ctx.sanitizedBody = {};
-    }
-    await next();
+module.exports = {
+    validate,
+    sanitize,
+    resultValidators,
+    reportValidators,
 };
