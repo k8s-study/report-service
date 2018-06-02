@@ -2,13 +2,19 @@ const Router = require('koa-router');
 
 const config = require('./config');
 const controllers = require('./controllers');
-const validators = require('./validators');
+const {
+    reportValidators,
+    resultValidators,
+} = require('./validators');
+const {
+    buildValidateMiddleware,
+} = require('./middlewares');
 
 const router = new Router({
     prefix: `/${config.API_VER}`,
 });
 router.get('/health', controllers.healthcheck);
-router.post('/results', validators.results, controllers.results);
-router.get('/reports', validators.reports, controllers.reports);
+router.post('/results', buildValidateMiddleware(resultValidators, 'request.body'), controllers.results);
+router.get('/reports', buildValidateMiddleware(reportValidators, 'query'), controllers.reports);
 
 module.exports = router;

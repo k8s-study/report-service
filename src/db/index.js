@@ -1,5 +1,9 @@
 const arangojs = require('arangojs');
-const dbConfig = require('./config').database;
+
+const dbConfig = require('../config').database;
+const {
+    DatabaseClient,
+} = require('./client');
 
 // database connection pool
 const db = new arangojs.Database({
@@ -20,14 +24,8 @@ collection.get().then(null, () => {
     });
 });
 
-const setContext = () => async (ctx, next) => {
-    ctx.db = db;
-    ctx.reports = collection;
-    await next();
-};
-
 module.exports = {
     db,
     collection,
-    setContext,
+    client: new DatabaseClient(db, collection),
 };

@@ -1,7 +1,11 @@
 const validators = require('../validators');
+const {
+    buildValidateMiddleware,
+} = require('../middlewares');
 
-describe('Validator for pinged results', async () => {
+describe('ValidateMiddleware for pinged results', async () => {
     const next = jest.fn();
+    const middleware = buildValidateMiddleware(validators.resultValidators, 'request.body');
     let ctx;
 
     beforeEach(() => {
@@ -13,7 +17,7 @@ describe('Validator for pinged results', async () => {
     });
 
     test('should return invalid status when required fields do not exist', async () => {
-        await validators.results(ctx, next);
+        await middleware(ctx, next);
         expect(ctx.validation.isValid).toBe(false);
         expect(ctx.validation.messages).toEqual({
             url: 'required but not provided',
@@ -33,7 +37,7 @@ describe('Validator for pinged results', async () => {
                 },
             },
         };
-        await validators.results(ctx, next);
+        await middleware(ctx, next);
         expect(ctx.validation.isValid).toBe(true);
         expect(ctx.validation.messages).toEqual({});
         expect(ctx.sanitizedBody).toEqual(ctx.request.body);
@@ -49,7 +53,7 @@ describe('Validator for pinged results', async () => {
                 },
             },
         };
-        await validators.results(ctx, next);
+        await middleware(ctx, next);
         expect(ctx.validation.isValid).toBe(false);
         expect(ctx.validation.messages).toEqual({
             url: 'invalid URL format',
@@ -70,7 +74,7 @@ describe('Validator for pinged results', async () => {
                 },
             },
         };
-        await validators.results(ctx, next);
+        await middleware(ctx, next);
         expect(ctx.validation.isValid).toBe(false);
         expect(ctx.validation.messages).toEqual({
             latency: 'invalid latency (ms), must be of integer lte 0',
@@ -91,7 +95,7 @@ describe('Validator for pinged results', async () => {
                 },
             },
         };
-        await validators.results(ctx, next);
+        await middleware(ctx, next);
         expect(ctx.validation.isValid).toBe(true);
         expect(ctx.validation.messages).toEqual({});
         expect(ctx.sanitizedBody).toEqual({
@@ -106,6 +110,7 @@ describe('Validator for pinged results', async () => {
 
 describe('Validator for report report query', async () => {
     const next = jest.fn();
+    const middleware = buildValidateMiddleware(validators.reportValidators, 'query');
     let ctx;
 
     beforeEach(() => {
@@ -115,7 +120,7 @@ describe('Validator for report report query', async () => {
     });
 
     test('should return invalid status when required fields do not exist', async () => {
-        await validators.reports(ctx, next);
+        await middleware(ctx, next);
         expect(ctx.validation.isValid).toBe(false);
         expect(ctx.validation.messages).toEqual({
             url: 'required but not provided',
@@ -133,7 +138,7 @@ describe('Validator for report report query', async () => {
                 endtime: '2018-05-31T23:20:50.52Z',
             },
         };
-        await validators.reports(ctx, next);
+        await middleware(ctx, next);
         expect(ctx.validation.isValid).toBe(true);
         expect(ctx.validation.messages).toEqual({});
         expect(ctx.sanitizedBody).toEqual(ctx.query);
@@ -147,7 +152,7 @@ describe('Validator for report report query', async () => {
                 endtime: '2018-04-31T23:20:50.52Z', // there is not the day 31 in April
             },
         };
-        await validators.reports(ctx, next);
+        await middleware(ctx, next);
         expect(ctx.validation.isValid).toBe(false);
         expect(ctx.validation.messages).toEqual({
             url: 'invalid URL format',
@@ -165,7 +170,7 @@ describe('Validator for report report query', async () => {
                 summary: 'python',
             },
         };
-        await validators.reports(ctx, next);
+        await middleware(ctx, next);
         expect(ctx.validation.isValid).toBe(false);
         expect(ctx.validation.messages).toEqual({
             summary: 'summary must be of one of true, false, or not provided',
@@ -185,7 +190,7 @@ describe('Validator for report report query', async () => {
                 comment: 'good',
             },
         };
-        await validators.reports(ctx, next);
+        await middleware(ctx, next);
         expect(ctx.validation.isValid).toBe(true);
         expect(ctx.validation.messages).toEqual({});
         expect(ctx.sanitizedBody).toEqual({

@@ -3,6 +3,7 @@ const logger = require('koa-logger');
 const bodyParser = require('koa-bodyparser');
 
 const db = require('./src/db');
+const middlewares = require('./src/middlewares');
 const { environment } = require('./src/config');
 const routes = require('./src/routes');
 
@@ -14,8 +15,11 @@ if (environment === 'develop') {
 }
 
 app.use(bodyParser());
-
-app.use(db.setContext());
+app.use(middlewares.setContext({
+    database: {
+        client: db.client,
+    },
+}));
 app.use(routes.routes());
 
 module.exports = app;
