@@ -1,6 +1,9 @@
 const arangojs = require('arangojs');
 
 const dbConfig = require('../config').database;
+const {
+    DatabaseClient,
+} = require('./client');
 
 // database connection pool
 const db = new arangojs.Database({
@@ -24,4 +27,5 @@ collection.get().then(null, () => {
 module.exports = {
     db,
     collection,
+    client: new DatabaseClient(db, collection),
 };
